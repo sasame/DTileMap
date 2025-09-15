@@ -36,10 +36,16 @@ public class DTileMapEditor : Editor
 
     public void OnSceneGUI()
     {
-        displayCollider();
-        if (Tools.current != Tool.Custom) return;
-
         DTilemapLayer tilemap = (DTilemapLayer)target;
+        var prevMatrix = Handles.matrix;
+        Handles.matrix = tilemap.transform.localToWorldMatrix;
+        displayCollider();
+        if (Tools.current != Tool.Custom)
+        {
+            Handles.matrix = prevMatrix;
+            return;
+        }
+
         Handles.color = Color.green;
         Handles.PositionHandle(Vector3.zero, Quaternion.identity);
 
@@ -53,7 +59,9 @@ public class DTileMapEditor : Editor
         float enter;
         if (plane.Raycast(ray, out enter))
         {
-            basePos = Vector3Int.FloorToInt(ray.origin + ray.direction * enter);
+            var pos3D = ray.origin + ray.direction * enter;
+//            basePos = Vector3Int.RoundToInt(tilemap.transform.localToWorldMatrix.MultiplyPoint((Vector3)basePos));
+            basePos = Vector3Int.FloorToInt(tilemap.transform.worldToLocalMatrix.MultiplyPoint(pos3D));
         }
 
         if (e.type == EventType.Repaint)
@@ -88,6 +96,7 @@ public class DTileMapEditor : Editor
             {
                 Handles.DrawAAConvexPolygon(basePos, basePos + Vector3.right, basePos + new Vector3(1f, 1f, 0f), basePos + Vector3.up);
             }
+
         }
         else if (e.type == EventType.MouseDown && e.button == 0)
         {
@@ -125,6 +134,7 @@ public class DTileMapEditor : Editor
         }
 
         SceneView.RepaintAll();
+        Handles.matrix = prevMatrix;
     }
 
     void colliderLine(Vector3 a, Vector3 b)

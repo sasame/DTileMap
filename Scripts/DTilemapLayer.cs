@@ -20,7 +20,17 @@ namespace DTileMap
         public int Width => _width;
         public int Height => _height;
         public float TileSize => _tileSize;
-        public int[] Tiles => _tiles;
+        public int[] Tiles
+        {
+            get
+            {
+                if ((_tiles == null) || (_tiles.Length != _width * _height))
+                {
+                    initMesh();
+                }
+                return _tiles;
+            }
+        }
 
         void initMesh()
         {
