@@ -103,24 +103,24 @@ public class DTileMapEditor : Editor
             // 左クリック押し始め → ペイント開始
             _isPainting = true;
             paint(basePos);
-            e.Use(); // ← Unityの選択イベントを奪う
+//            e.Use(); // ← Unityの選択イベントを奪う
         }
         else if (e.type == EventType.MouseDrag && e.button == 0 && _isPainting)
         {
             // ドラッグ中もペイント
             paint(basePos);
-            e.Use(); // ← Unityの選択イベントを奪う
+//            e.Use(); // ← Unityの選択イベントを奪う
         }
         else if (e.type == EventType.MouseUp && e.button == 0)
         {
             // ボタン離したら終了
             _isPainting = false;
-            e.Use();
+//            e.Use();
         }
         else if (e.type == EventType.Used)
         {
             //
-            e.Use();
+//            e.Use();
         }
         else if (e.type == EventType.Layout)
         {
@@ -156,6 +156,8 @@ public class DTileMapEditor : Editor
         DTilemapLayer tilemap = (DTilemapLayer)target;
         var spCollider = tilemap.SpriteCollider;
         if (!spCollider) return;
+        if (!tilemap) return;
+        if (tilemap.Width * tilemap.Height != tilemap.Tiles.Length) return;
 
         var w = tilemap.Width;
         var h = tilemap.Height;

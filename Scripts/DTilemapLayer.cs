@@ -24,17 +24,18 @@ namespace DTileMap
         {
             get
             {
-                if ((_tiles == null) || (_tiles.Length != _width * _height))
+                return _tiles;
+/*                if ((_tiles == null) || (_tiles.Length != _width * _height))
                 {
                     initMesh();
                 }
-                return _tiles;
+                return _tiles;*/
             }
         }
 
         void initMesh()
         {
-            _tiles = new int[_width * _height];
+//            _tiles = new int[_width * _height];
             _mesh = new Mesh();
             GetComponent<MeshFilter>().mesh = _mesh;
         }
@@ -45,12 +46,21 @@ namespace DTileMap
             RebuildMesh();
         }
 
+        public void ResizeTiles()
+        {
+            _tiles = new int[_width * _height];
+        }
+
         public void SetTile(int x, int y, int tileId)
         {
             if (!((x >= 0) && (x < _width))) return;
             if (!((y >= 0) && (y < _height))) return;
             if (_mesh == null) initMesh();
-            if (_tiles.Length != _width * _height) initMesh();
+            if (_tiles.Length != _width * _height)
+            {
+                ResizeTiles();
+                initMesh();
+            }
 
             int idx = x + y * _width;
             _tiles[idx] = tileId;
