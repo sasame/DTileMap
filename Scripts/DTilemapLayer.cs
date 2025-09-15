@@ -6,20 +6,21 @@ namespace DTileMap
 {
 
     [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
-    public class TileMap : MonoBehaviour
+    public class DTilemapLayer : MonoBehaviour
     {
         [SerializeField] SpriteColliderObject _spriteCollider;
         [SerializeField] int _width = 16;
         [SerializeField] int _height = 16;
         [SerializeField] float _tileSize = 1f;
-        //        public int tilesX = 4; // アトラス横分割数
-        //        public int tilesY = 4; // アトラス縦分割数
+        [SerializeField] int[] _tiles; // タイルIDs
 
-        private int[] _tiles; // タイルID管理
         private Mesh _mesh;
 
+        public SpriteColliderObject SpriteCollider => _spriteCollider;
         public int Width => _width;
         public int Height => _height;
+        public float TileSize => _tileSize;
+        public int[] Tiles => _tiles;
 
         void initMesh()
         {

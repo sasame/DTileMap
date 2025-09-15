@@ -14,8 +14,6 @@ namespace DEditor
         public override void OnInspectorGUI()
         {
             DrawDefaultInspector();
-            //            serializedObject.Update();
-            //            serializedObject.ApplyModifiedProperties();
             // --- ボタンを追加 ---
             var myScript = (SpriteColliderObject)target;
             if (GUILayout.Button("Open"))

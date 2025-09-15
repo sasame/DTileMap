@@ -70,6 +70,8 @@ namespace DTileMap
         public Texture2D TilemapTexture => _tilemapTexture;
         public int CellWidth => _cellWidth;
         public int CellHeight => _cellHeight;
+        public int CellCountX => Mathf.CeilToInt(_tilemapTexture.width / _cellWidth);
+        public int CellCountY => Mathf.CeilToInt(_tilemapTexture.height / _cellHeight);
 
         public CellInfo Get(Vector2Int pos)
         {
