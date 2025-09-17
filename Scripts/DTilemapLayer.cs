@@ -13,6 +13,8 @@ namespace DTileMap
         [SerializeField] int _height = 16;
         [SerializeField] float _tileSize = 1f;
         [SerializeField] int[] _tiles; // タイルIDs
+        // コリジョンの有無
+        [SerializeField] bool _collision;
 
         private Mesh _mesh;
 
@@ -26,6 +28,11 @@ namespace DTileMap
             {
                 return _tiles;
             }
+        }
+        // コリジョンの有無
+        public bool Collision
+        {
+            get { return _collision; }
         }
 
         void initMesh()
