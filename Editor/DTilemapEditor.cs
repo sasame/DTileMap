@@ -259,9 +259,10 @@ public class DTileMapEditor : Editor
         var collider = tilemap.GetComponent<PolygonCollider2D>();
         if (!collider)
         {
-            collider = tilemap.gameObject.AddComponent<PolygonCollider2D>();
             var tiles = tilemap.Tiles;
             var spCollider = tilemap.SpriteCollider;
+            if (spCollider == null) return;
+            collider = tilemap.gameObject.AddComponent<PolygonCollider2D>();
             List<Vector2[]> shapes = new List<Vector2[]>();
             Vector2 ofs = Vector2.zero;
             for (int y=0;y< tilemap.Height;++y)
