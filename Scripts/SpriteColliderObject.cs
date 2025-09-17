@@ -34,6 +34,8 @@ namespace DTileMap
         Angle67_LT2,
         Angle67_RT1,
         Angle67_RT2,
+
+        Count,
     }
 
     [System.Serializable]
@@ -57,6 +59,50 @@ namespace DTileMap
         {
             return _pos.ToString() + " : " + _collision;
         }
+
+        static Vector2 p00 = new Vector2(0f, 0f);
+        static Vector2 p01 = new Vector2(0f, 0.5f);
+        static Vector2 p02 = new Vector2(0f, 1f);
+        static Vector2 p10 = new Vector2(0.5f, 0f);
+        static Vector2 p11 = new Vector2(0.5f, 0.5f);
+        static Vector2 p12 = new Vector2(0.5f, 1f);
+        static Vector2 p20 = new Vector2(1f, 0f);
+        static Vector2 p21 = new Vector2(1f, 0.5f);
+        static Vector2 p22 = new Vector2(1f, 1f);
+        static Vector2[][] _cellCollisionTable = new Vector2[(int)CellCollision.Count][]
+        {
+            null,   // None
+            new Vector2[]{ p00,p20,p22,p02 },   // Box
+            new Vector2[]{p00,p20,p02}, // Angle45_LB
+            new Vector2[]{p02,p00,p02}, // Angle45_RB
+            new Vector2[]{p20,p22,p00}, // Angle45_LT
+            new Vector2[]{p22,p02,p20}, // Angle45_RT
+            new Vector2[]{p00,p01,p20}, // Angle22_LB1
+            new Vector2[]{p00,p02,p12,p02}, // Angle22_LB2
+            new Vector2[]{p02,p00,p12}, // Angle22_RB1
+            new Vector2[]{p00,p10,p22,p02}, // Angle22_RB2
+            new Vector2[]{p20,p22,p10}, // Angle22_LT1
+            new Vector2[]{p20,p22,p12,p00}, // Angle22_LT2
+            new Vector2[]{p22,p12,p20}, // Angle22_RT1
+            new Vector2[]{p22,p02,p10,p20}, // Angle22_RT2
+            new Vector2[]{p00,p10,p12,p02}, // Half_B
+            new Vector2[]{p00,p20,p21,p01}, // Half_L
+            new Vector2[]{p22,p02,p01,p21}, // Half_R
+            new Vector2[]{p20,p22,p12,p10}, // Half_T
+            new Vector2[]{p00,p20,p01}, // Angle67_LB1
+            new Vector2[]{p00,p20,p21,p02}, // Angle67_LB2
+            new Vector2[]{p02,p01,p22}, // Angle67_RB1
+            new Vector2[]{p02,p00,p21,p22}, // Angle67_RB2
+            new Vector2[]{p20,p21,p00}, // Angle67_LT1
+            new Vector2[]{p20,p22,p01,p00}, // Angle67_LT2
+            new Vector2[]{p22,p02,p21}, // Angle67_RT1
+            new Vector2[]{p22,p02,p01,p20}, // Angle67_RT2
+        };
+        // コリジョンの形状を取得
+        public static Vector2[] GetShape(CellCollision collision)
+        {
+            return _cellCollisionTable[(int)collision];
+        }
     }
 
     [CreateAssetMenu(fileName = "SpriteColliderObject", menuName = "ScriptableObjects/CreateSpriteColliderObject")]
@@ -73,6 +119,12 @@ namespace DTileMap
         public int CellCountX => Mathf.CeilToInt(_tilemapTexture.width / _cellWidth);
         public int CellCountY => Mathf.CeilToInt(_tilemapTexture.height / _cellHeight);
 
+        // セル情報を取得
+        public CellInfo Get(int idx)
+        {
+            return Get(new Vector2Int(idx % CellCountX, idx / CellCountX));
+        }
+        // セル情報を取得
         public CellInfo Get(Vector2Int pos)
         {
             var item = _listInfo.FirstOrDefault(t => t.Position == pos);

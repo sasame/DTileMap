@@ -25,22 +25,24 @@ namespace DTileMap
             get
             {
                 return _tiles;
-/*                if ((_tiles == null) || (_tiles.Length != _width * _height))
-                {
-                    initMesh();
-                }
-                return _tiles;*/
             }
         }
 
         void initMesh()
         {
-//            _tiles = new int[_width * _height];
+            //            _tiles = new int[_width * _height];
+            if (_mesh) return;
             _mesh = new Mesh();
             GetComponent<MeshFilter>().mesh = _mesh;
         }
 
         void Awake()
+        {
+            initMesh();
+            RebuildMesh();
+        }
+
+        private void OnEnable()
         {
             initMesh();
             RebuildMesh();

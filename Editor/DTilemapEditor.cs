@@ -256,11 +256,37 @@ public class DTileMapEditor : Editor
     {
         DTilemapLayer tilemap = (DTilemapLayer)target;
 
-        var tile = tilemap.Tiles;
         var collider = tilemap.GetComponent<PolygonCollider2D>();
         if (!collider)
         {
             collider = tilemap.gameObject.AddComponent<PolygonCollider2D>();
+            var tiles = tilemap.Tiles;
+            var spCollider = tilemap.SpriteCollider;
+            List<Vector2[]> shapes = new List<Vector2[]>();
+            Vector2 ofs = Vector2.zero;
+            for (int y=0;y< tilemap.Height;++y)
+            {
+                ofs.y = y * tilemap.TileSize;
+                for (int x = 0; x < tilemap.Width; ++x)
+                {
+                    ofs.x = x * tilemap.TileSize;
+                    int idx = y * tilemap.Width + x;
+                    int tileIdx = tiles[idx];
+                    var cellInfo = spCollider.Get(tileIdx);
+                    var shape = CellInfo.GetShape(cellInfo.Collision);
+                    if (shape!=null)
+                    {
+                        var cloneShape = (Vector2[])shape.Clone();
+                        for (int i = 0; i < cloneShape.Length; ++i) cloneShape[i] += ofs;
+                        shapes.Add(cloneShape);
+                    }
+                }
+            }
+            collider.pathCount = shapes.Count;
+            for(int idShape=0;idShape<shapes.Count;++idShape)
+            {
+                collider.SetPath(idShape,shapes[idShape]);
+            }
         }
     }
 
