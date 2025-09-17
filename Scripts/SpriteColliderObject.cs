@@ -74,7 +74,7 @@ namespace DTileMap
             null,   // None
             new Vector2[]{ p00,p20,p22,p02 },   // Box
             new Vector2[]{p00,p20,p02}, // Angle45_LB
-            new Vector2[]{p02,p00,p02}, // Angle45_RB
+            new Vector2[]{p02,p00,p20}, // Angle45_RB
             new Vector2[]{p20,p22,p00}, // Angle45_LT
             new Vector2[]{p22,p02,p20}, // Angle45_RT
             new Vector2[]{p00,p01,p20}, // Angle22_LB1
