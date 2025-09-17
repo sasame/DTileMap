@@ -274,6 +274,7 @@ public class DTileMapEditor : Editor
                     int idx = y * tilemap.Width + x;
                     int tileIdx = tiles[idx];
                     var cellInfo = spCollider.Get(tileIdx);
+                    if (cellInfo == null) continue;
                     var shape = CellInfo.GetShape(cellInfo.Collision);
                     if (shape!=null)
                     {
