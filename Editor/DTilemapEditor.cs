@@ -157,7 +157,7 @@ public class DTileMapEditor : Editor
         DTilemapLayer tilemap = (DTilemapLayer)target;
         var prevMatrix = Handles.matrix;
         Handles.matrix = tilemap.transform.localToWorldMatrix;
-        displayCollider();
+//        displayCollider();
         if (Tools.current != Tool.Custom)
         {
             Handles.matrix = prevMatrix;
@@ -248,7 +248,7 @@ public class DTileMapEditor : Editor
         }
         else
         {
-            Debug.Log("other event:" + e.type);
+//            Debug.Log("other event:" + e.type);
         }
 
         SceneView.RepaintAll();

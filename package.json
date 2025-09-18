@@ -1,6 +1,6 @@
 {
   "name": "xyz.mosq.dtilemap",
-  "version": "0.2.9",
+  "version": "0.3.0",
   "displayName": "DTileMap",
   "unity": "2020.1",
   "description": "Tilemap",
