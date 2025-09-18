@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DCode;
 
 namespace DTileMap
 {
@@ -106,16 +107,18 @@ namespace DTileMap
                     // UV計算
                     int tx = tileId % tilesX;
                     int ty = tileId / tilesX;
-                    float uvSizeX = 1f / tilesX;
-                    float uvSizeY = 1f / tilesY;
+                    //                    float uvSizeX = 1f / tilesX;
+                    //                    float uvSizeY = 1f / tilesY;
 
-                    float u0 = tx * uvSizeX;
-                    float v0 = ty * uvSizeY;
+                    float u0 = tx / (float)tilesX;
+                    float v0 = ty / (float)tilesY;
+                    float u1 = (tx+1) / (float)tilesX;
+                    float v1 = (ty+1) / (float)tilesY;
 
                     uvs.Add(new Vector2(u0, v0));
-                    uvs.Add(new Vector2(u0 + uvSizeX, v0));
-                    uvs.Add(new Vector2(u0 + uvSizeX, v0 + uvSizeY));
-                    uvs.Add(new Vector2(u0, v0 + uvSizeY));
+                    uvs.Add(new Vector2(u1, v0));
+                    uvs.Add(new Vector2(u1, v1));
+                    uvs.Add(new Vector2(u0, v1));
 
                     // インデックス
                     triangles.Add(vIndex + 0);
@@ -133,6 +136,38 @@ namespace DTileMap
             _mesh.SetTriangles(triangles, 0);
         }
 
+        // RaycastHit2Dを使わずに、DTilemapLayerの独自データを返す方が良いかも
+        public UnityEngine.RaycastHit2D Raycast(Vector2 from,Vector2 to)
+        {
+            var hit = default(UnityEngine.RaycastHit2D);
+            var localFrom = transform.worldToLocalMatrix.MultiplyPoint(from) / _tileSize;
+            var localTo = transform.worldToLocalMatrix.MultiplyPoint(to) / _tileSize;
+            Vector2 worldFrom = from;
+            float amountA, amountB;
+            {
+                var basePos = new Vector2Int(Mathf.FloorToInt(localFrom.x), Mathf.FloorToInt(localFrom.y));
+                var cellInfo = _spriteCollider.Get(basePos);
+                var shape = CellInfo.GetShape(cellInfo.Collision);
+                if (shape!=null)
+                {
+                    for (int idLine=0;idLine<=shape.Length;++idLine)
+                    {
+                        var p0 = shape[idLine] + basePos;
+                        var p1 = shape[idLine % shape.Length] + basePos;
+                        if (Vector2Ext.IsCrossLine(localFrom,localTo,p0,p1,out amountA,out amountB))
+                        {
+                            hit.point = transform.localToWorldMatrix.MultiplyPoint(Vector2.Lerp(p0, p1, amountB));
+                            var normal = transform.localToWorldMatrix.MultiplyVector(Vector2.Perpendicular(p1 - p0));
+                            hit.normal = normal;
+                            hit.distance = (hit.point - worldFrom).magnitude;
+//                            hit.transform = transform;
+                        }
+                    }
+                }
+            }
+
+            return hit;
+        }
 
     }
 

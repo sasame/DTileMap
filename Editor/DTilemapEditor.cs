@@ -1,10 +1,127 @@
 #if UNITY_EDITOR
 
 using System.Collections;
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using DTileMap;
+
+
+
+
+class TilemapMakeCollider
+{
+    const float SCALE = 10f;
+    public struct Edge
+    {
+        public Vector2Int a;
+        public Vector2Int b;
+        public Edge(Vector2Int p0, Vector2Int p1)
+        {
+            a = p0;
+            b = p1;
+        }
+        public Edge CreateInverse()
+        {
+            return new Edge(b, a);
+        }
+        public Vector2 Direction
+        {
+            get { return b - a; }
+        }
+    }
+    List<Edge> _edges = new List<Edge>();
+    List<List<Vector2>> _pathList = new List<List<Vector2>>();
+
+/*    public List<Edge> Edges
+    {
+        get { return _edges; }
+    }*/
+    public List<List<Vector2>> PathList
+    {
+        get { return _pathList; }
+    }
+
+    public void Add(Vector2 a,Vector2 b)
+    {
+        var e = new Edge(Vector2Int.RoundToInt(a * SCALE), Vector2Int.RoundToInt(b * SCALE));
+        _edges.Add(e);
+    }
+
+    public void RemoveOverlapEdge()
+    {
+        var hashEdge = new HashSet<Edge>(_edges);
+        // 重なっている部分のエッジを消す
+        for(int idEdge=0;idEdge<_edges.Count;++idEdge)
+        {
+            var e = _edges[idEdge];
+            var inv = e.CreateInverse();
+            if (hashEdge.Contains(inv))
+            {
+                hashEdge.Remove(e);
+                hashEdge.Remove(inv);
+            }
+        }
+        _edges = new List<Edge>(hashEdge);
+
+        // make path
+        var dicEdges = new Dictionary<Vector2Int, List<Edge>>();
+        foreach(var e in hashEdge)
+        {
+            if (dicEdges.ContainsKey(e.a)) dicEdges[e.a].Add(e);
+            else dicEdges[e.a] = new List<Edge>() { e };
+//            if (dicEdges.ContainsKey(e.b)) dicEdges[e.b].Add(e);
+//            else dicEdges[e.b] = new List<Edge>() { e };
+        }
+
+        // connect edge
+        _pathList.Clear();
+        int errorCheck = 0;
+        while (hashEdge.Count>0)
+        {
+            var first = hashEdge.First();
+            hashEdge.Remove(first);
+            var prev = first;
+            var path = new List<Vector2>();
+            path.Add((Vector2)prev.a / SCALE);
+
+            do
+            {
+                ++errorCheck;
+                if (errorCheck > 10000) return;
+
+                var nexts = dicEdges[prev.b];
+                float maxAngle = float.MinValue;
+                Edge? maxEdge = null;
+                foreach (var n in nexts)
+                {
+                    var ang = Vector2.SignedAngle(prev.Direction.normalized, n.Direction.normalized);
+                    if (maxAngle < ang)
+                    {
+                        maxAngle = ang;
+                        maxEdge = n;
+                    }
+                }
+                if (maxEdge.HasValue)
+                {
+                    prev = maxEdge.Value;
+                    if (Mathf.Abs(maxAngle) > 1f) path.Add((Vector2)prev.a / SCALE);
+                }
+                else
+                {
+                    break;
+                }
+                hashEdge.Remove(prev);
+                if (prev.b == first.a) break;
+            } while (hashEdge.Count>0);
+
+            _pathList.Add(path);
+        }
+    }
+}
+
+
 
 
 [CustomEditor(typeof(DTilemapLayer))]
@@ -265,6 +382,7 @@ public class DTileMapEditor : Editor
             collider = tilemap.gameObject.AddComponent<PolygonCollider2D>();
             List<Vector2[]> shapes = new List<Vector2[]>();
             Vector2 ofs = Vector2.zero;
+            var maker = new TilemapMakeCollider();
             for (int y=0;y< tilemap.Height;++y)
             {
                 ofs.y = y * tilemap.TileSize;
@@ -278,17 +396,27 @@ public class DTileMapEditor : Editor
                     var shape = CellInfo.GetShape(cellInfo.Collision);
                     if (shape!=null)
                     {
-                        var cloneShape = (Vector2[])shape.Clone();
-                        for (int i = 0; i < cloneShape.Length; ++i) cloneShape[i] += ofs;
-                        shapes.Add(cloneShape);
+                        for (int idEdge = 0; idEdge < shape.Length; ++idEdge)
+                        {
+                            maker.Add(shape[idEdge] + ofs, shape[(idEdge + 1) % shape.Length] + ofs);
+                        }
                     }
                 }
             }
-            collider.pathCount = shapes.Count;
+            maker.RemoveOverlapEdge();
+            collider.pathCount = maker.PathList.Count;
+            for(int idEdge=0;idEdge< maker.PathList.Count; ++idEdge)
+            {
+                collider.SetPath(idEdge, maker.PathList[idEdge]);
+//                var e = maker.Edges[idEdge];
+//                collider.SetPath(idEdge,new Vector2[] { e.a, e.b });
+            }
+
+/*            collider.pathCount = shapes.Count;
             for(int idShape=0;idShape<shapes.Count;++idShape)
             {
                 collider.SetPath(idShape,shapes[idShape]);
-            }
+            }*/
         }
     }
 

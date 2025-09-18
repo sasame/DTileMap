@@ -1,7 +1,9 @@
 {
     "name": "DTileMap",
     "rootNamespace": "DTileMap",
-    "references": [],
+    "references": [
+        "GUID:4ce7d5a73d340ff438a47d9d3a7ad309"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

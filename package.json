@@ -1,6 +1,6 @@
 {
   "name": "xyz.mosq.dtilemap",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "displayName": "DTileMap",
   "unity": "2020.1",
   "description": "Tilemap",
@@ -8,5 +8,8 @@
     "name": "DRFTERS",
     "url": "https://github.com/sasame"
   },
+  "dependencies": {
+    "xyz.mosq.dcode": "https://github.com/sasame/DCode.git"
+  },  
   "license":"MIT"
 }
