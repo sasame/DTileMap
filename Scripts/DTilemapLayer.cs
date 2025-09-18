@@ -52,6 +52,9 @@ namespace DTileMap
 
         private void OnEnable()
         {
+        }
+        private void OnValidate()
+        {
             initMesh();
             RebuildMesh();
         }

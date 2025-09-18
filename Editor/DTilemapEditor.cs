@@ -380,7 +380,7 @@ public class DTileMapEditor : Editor
             var tiles = tilemap.Tiles;
             var spCollider = tilemap.SpriteCollider;
             if (spCollider == null) return;
-            collider = tilemap.gameObject.AddComponent<PolygonCollider2D>();
+            collider = Undo.AddComponent<PolygonCollider2D>(tilemap.gameObject);
             List<Vector2[]> shapes = new List<Vector2[]>();
             Vector2 ofs = Vector2.zero;
             var maker = new TilemapMakeCollider();
@@ -409,15 +409,7 @@ public class DTileMapEditor : Editor
             for(int idEdge=0;idEdge< maker.PathList.Count; ++idEdge)
             {
                 collider.SetPath(idEdge, maker.PathList[idEdge]);
-//                var e = maker.Edges[idEdge];
-//                collider.SetPath(idEdge,new Vector2[] { e.a, e.b });
             }
-
-/*            collider.pathCount = shapes.Count;
-            for(int idShape=0;idShape<shapes.Count;++idShape)
-            {
-                collider.SetPath(idShape,shapes[idShape]);
-            }*/
         }
     }
 
