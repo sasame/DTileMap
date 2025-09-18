@@ -132,6 +132,7 @@ public class DTileMapEditor : Editor
 
     void paint(Vector3Int pos)
     {
+        if (!EditorWindow.HasOpenInstances<DTilemapEditorWindow>()) return;
 //        Debug.Log(pos.x + ":" + pos.y);
         DTilemapLayer tilemap = (DTilemapLayer)target;
         var spCollider = tilemap.SpriteCollider;
@@ -200,9 +201,9 @@ public class DTileMapEditor : Editor
             Handles.color = new Color(0.5f, 0.5f, 0.5f, 0.5f);
             Handles.DrawLines(_tmpLines);
 
-            var window = EditorWindow.GetWindow<DTilemapEditorWindow>();
-            if (window)
+            if (EditorWindow.HasOpenInstances<DTilemapEditorWindow>())
             {
+                var window = EditorWindow.GetWindow<DTilemapEditorWindow>();
                 var sel = window.GetSelctionTile();
                 var dif = sel.Item2 - sel.Item1;
                 var sizeX = dif.x + 1f;
