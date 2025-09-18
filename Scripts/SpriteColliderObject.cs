@@ -61,13 +61,13 @@ namespace DTileMap
         }
 
         static Vector2 p00 = new Vector2(0f, 0f);
-        static Vector2 p01 = new Vector2(0f, 0.5f);
-        static Vector2 p02 = new Vector2(0f, 1f);
-        static Vector2 p10 = new Vector2(0.5f, 0f);
+        static Vector2 p01 = new Vector2(0.5f, 0f);
+        static Vector2 p02 = new Vector2(1f, 0f);
+        static Vector2 p10 = new Vector2(0f, 0.5f);
         static Vector2 p11 = new Vector2(0.5f, 0.5f);
-        static Vector2 p12 = new Vector2(0.5f, 1f);
-        static Vector2 p20 = new Vector2(1f, 0f);
-        static Vector2 p21 = new Vector2(1f, 0.5f);
+        static Vector2 p12 = new Vector2(1f, 0.5f);
+        static Vector2 p20 = new Vector2(0f, 1f);
+        static Vector2 p21 = new Vector2(0.5f, 1f);
         static Vector2 p22 = new Vector2(1f, 1f);
         static Vector2[][] _cellCollisionTable = new Vector2[(int)CellCollision.Count][]
         {
