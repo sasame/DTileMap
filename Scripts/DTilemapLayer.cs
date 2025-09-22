@@ -18,6 +18,7 @@ namespace DTileMap
         [SerializeField] bool _collision;
 
         private Mesh _mesh;
+        [SerializeField] RenderTexture _rtTilemap;
 
         public SpriteColliderObject SpriteCollider => _spriteCollider;
         public int Width => _width;
@@ -48,6 +49,7 @@ namespace DTileMap
         {
             initMesh();
             RebuildMesh();
+            RenderTilemapToRT();
         }
 
         private void OnEnable()
@@ -59,6 +61,37 @@ namespace DTileMap
             RebuildMesh();
         }
 
+        void OnDestroy()
+        {
+            if (_rtTilemap != null)
+            {
+                DestroyImmediate(_rtTilemap);
+            }
+        }
+
+        void RenderTilemapToRT()
+        {
+            if (_rtTilemap == null)
+            {
+                var w = _width * _spriteCollider.CellWidth;
+                var h = _height * _spriteCollider.CellHeight;
+                _rtTilemap = new RenderTexture(w, h, 0, RenderTextureFormat.ARGB32);
+            }
+
+            // RenderTextureを有効にする
+            RenderTexture.active = _rtTilemap;
+
+            // ビューポートを設定
+            GL.PushMatrix();
+            GL.LoadProjectionMatrix(Matrix4x4.Ortho(0, 1, 0, 1, -1, 1));
+
+            // メッシュを描画
+            Graphics.DrawMeshNow(_mesh, Matrix4x4.identity);
+
+            GL.PopMatrix();
+
+            RenderTexture.active = null;
+        }
         public void ResizeTiles()
         {
             _tiles = new int[_width * _height];
@@ -115,8 +148,8 @@ namespace DTileMap
 
                     float u0 = tx / (float)tilesX;
                     float v0 = ty / (float)tilesY;
-                    float u1 = (tx+1) / (float)tilesX;
-                    float v1 = (ty+1) / (float)tilesY;
+                    float u1 = (tx + 1) / (float)tilesX;
+                    float v1 = (ty + 1) / (float)tilesY;
 
                     uvs.Add(new Vector2(u0, v0));
                     uvs.Add(new Vector2(u1, v0));
@@ -140,7 +173,7 @@ namespace DTileMap
         }
 
         // RaycastHit2Dを使わずに、DTilemapLayerの独自データを返す方が良いかも
-        public UnityEngine.RaycastHit2D Raycast(Vector2 from,Vector2 to)
+        public UnityEngine.RaycastHit2D Raycast(Vector2 from, Vector2 to)
         {
             var hit = default(UnityEngine.RaycastHit2D);
             var localFrom = transform.worldToLocalMatrix.MultiplyPoint(from) / _tileSize;
@@ -151,19 +184,19 @@ namespace DTileMap
                 var basePos = new Vector2Int(Mathf.FloorToInt(localFrom.x), Mathf.FloorToInt(localFrom.y));
                 var cellInfo = _spriteCollider.Get(basePos);
                 var shape = CellInfo.GetShape(cellInfo.Collision);
-                if (shape!=null)
+                if (shape != null)
                 {
-                    for (int idLine=0;idLine<=shape.Length;++idLine)
+                    for (int idLine = 0; idLine <= shape.Length; ++idLine)
                     {
                         var p0 = shape[idLine] + basePos;
                         var p1 = shape[idLine % shape.Length] + basePos;
-                        if (Vector2Ext.IsCrossLine(localFrom,localTo,p0,p1,out amountA,out amountB))
+                        if (Vector2Ext.IsCrossLine(localFrom, localTo, p0, p1, out amountA, out amountB))
                         {
                             hit.point = transform.localToWorldMatrix.MultiplyPoint(Vector2.Lerp(p0, p1, amountB));
                             var normal = transform.localToWorldMatrix.MultiplyVector(Vector2.Perpendicular(p1 - p0));
                             hit.normal = normal;
                             hit.distance = (hit.point - worldFrom).magnitude;
-//                            hit.transform = transform;
+                            //                            hit.transform = transform;
                         }
                     }
                 }

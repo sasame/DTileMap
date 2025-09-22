@@ -69,6 +69,10 @@ public class SpriteColliderEditor : DGridBaseWindow
             CellCollision.Angle67_LT2.ToString(),
             CellCollision.Angle67_RT1.ToString(),
             CellCollision.Angle67_RT2.ToString(),
+            CellCollision.Edge_B.ToString(),
+            CellCollision.Edge_L.ToString(),
+            CellCollision.Edge_R.ToString(),
+            CellCollision.Edge_T.ToString(),
         };
         _arrayIcons = new Texture2D[patternNames.Length];
         for (int i = 0; i < _arrayIcons.Length; ++i)

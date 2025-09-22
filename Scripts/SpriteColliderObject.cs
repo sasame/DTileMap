@@ -34,6 +34,10 @@ namespace DTileMap
         Angle67_LT2,
         Angle67_RT1,
         Angle67_RT2,
+        Edge_B,
+        Edge_L,
+        Edge_R,
+        Edge_T,
 
         Count,
     }
@@ -97,6 +101,10 @@ namespace DTileMap
             new Vector2[]{p20,p22,p01,p00}, // Angle67_LT2
             new Vector2[]{p22,p02,p21}, // Angle67_RT1
             new Vector2[]{p22,p02,p01,p20}, // Angle67_RT2
+            new Vector2[]{p00,p02}, // Edge_B
+            new Vector2[]{p00,p20}, // Edge_L
+            new Vector2[]{p02,p22}, // Edge_R
+            new Vector2[]{p20,p22}, // Edge_T
         };
         // コリジョンの形状を取得
         public static Vector2[] GetShape(CellCollision collision)

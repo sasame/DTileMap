@@ -31,31 +31,38 @@ class TilemapMakeCollider
             get { return b - a; }
         }
     }
-    List<Edge> _edges = new List<Edge>();
-    List<List<Vector2>> _pathList = new List<List<Vector2>>();
+    List<Edge> _polygons = new List<Edge>();
+    List<Edge> _lines = new List<Edge>();
+    List<List<Vector2>> _polygonList = new List<List<Vector2>>();
+    List<List<Vector2>> _edgeList = new List<List<Vector2>>();
 
-/*    public List<Edge> Edges
+    public List<List<Vector2>> PolygonList
     {
-        get { return _edges; }
-    }*/
-    public List<List<Vector2>> PathList
+        get { return _polygonList; }
+    }
+    public List<List<Vector2>> EdgeList
     {
-        get { return _pathList; }
+        get { return _edgeList; }
     }
 
-    public void Add(Vector2 a,Vector2 b)
+    public void Add(Vector2 a, Vector2 b)
     {
         var e = new Edge(Vector2Int.RoundToInt(a * SCALE), Vector2Int.RoundToInt(b * SCALE));
-        _edges.Add(e);
+        _polygons.Add(e);
+    }
+    public void AddLine(Vector2 a, Vector2 b)
+    {
+        var e = new Edge(Vector2Int.RoundToInt(a * SCALE), Vector2Int.RoundToInt(b * SCALE));
+        _lines.Add(e);
     }
 
     public void RemoveOverlapEdge()
     {
-        var hashEdge = new HashSet<Edge>(_edges);
+        var hashEdge = new HashSet<Edge>(_polygons);
         // 重なっている部分のエッジを消す
-        for(int idEdge=0;idEdge<_edges.Count;++idEdge)
+        for(int idEdge=0;idEdge< _polygons.Count;++idEdge)
         {
-            var e = _edges[idEdge];
+            var e = _polygons[idEdge];
             var inv = e.CreateInverse();
             if (hashEdge.Contains(inv))
             {
@@ -63,7 +70,7 @@ class TilemapMakeCollider
                 hashEdge.Remove(inv);
             }
         }
-        _edges = new List<Edge>(hashEdge);
+        _polygons = new List<Edge>(hashEdge);
 
         // make path
         var dicEdges = new Dictionary<Vector2Int, List<Edge>>();
@@ -76,7 +83,7 @@ class TilemapMakeCollider
         }
 
         // connect edge
-        _pathList.Clear();
+        _polygonList.Clear();
         int errorCheck = 0;
         while (hashEdge.Count>0)
         {
@@ -116,8 +123,62 @@ class TilemapMakeCollider
                 if (prev.b == first.a) break;
             } while (hashEdge.Count>0);
 
-            _pathList.Add(path);
+            _polygonList.Add(path);
         }
+    }
+
+    public void MergeLines()
+    {
+        HashSet<Edge> hashEdge = new HashSet<Edge>(_lines);
+        // make path
+        var dicEdgesA = new Dictionary<Vector2Int, Edge>();
+        var dicEdgesB = new Dictionary<Vector2Int, Edge>();
+        foreach (var e in _lines)
+        {
+            dicEdgesA[e.a] = e;
+        }
+        foreach (var e in _lines)
+        {
+            dicEdgesB[e.b] = e;
+        }
+
+        int errorCheck = 0;
+        while (hashEdge.Count > 0)
+        {
+            if (errorCheck++ > 10000) return;
+
+            var first = hashEdge.First();
+            var list = new List<Vector2>() { first.a, first.b };
+            hashEdge.Remove(first);
+            // to prev
+            var prev = first;
+            while (dicEdgesB.ContainsKey(prev.a))
+            {
+                if (errorCheck++ > 10000) return;
+
+                prev = dicEdgesB[prev.a];
+                hashEdge.Remove(prev);
+                list.Insert(0, prev.a);
+            }
+            // to next
+            var next = first;
+            while (dicEdgesA.ContainsKey(next.b))
+            {
+                if (errorCheck++ > 10000) return;
+
+                next = dicEdgesA[next.b];
+                hashEdge.Remove(next);
+                list.Add(next.b);
+            }
+
+            var path = list.ConvertAll(v => v / SCALE).ToList();
+            _edgeList.Add(path);
+        }
+
+/*        foreach (var l in _lines)
+        {
+            _pathList.Add(new List<Vector2>() { (Vector2)l.a / SCALE, (Vector2)l.b / SCALE });
+        }*/
     }
 }
 
@@ -139,6 +200,8 @@ public class DTileMapEditor : Editor
         var window = EditorWindow.GetWindow<DTilemapEditorWindow>();
         if (window)
         {
+            Undo.RecordObject(tilemap, "Change Tile");
+
             var sel = window.GetSelctionTile();
             for (int y = sel.Item1.y; y <= sel.Item2.y; ++y)
             {
@@ -149,6 +212,7 @@ public class DTileMapEditor : Editor
                     tilemap.SetTile(pos.x + ofsx, pos.y + ofsy, x + y * spCollider.CellCountX);
                 }
             }
+            EditorUtility.SetDirty(tilemap);
         }
     }
 
@@ -377,25 +441,33 @@ public class DTileMapEditor : Editor
         var collider = tilemap.GetComponent<PolygonCollider2D>();
         if (!collider)
         {
-            var tiles = tilemap.Tiles;
-            var spCollider = tilemap.SpriteCollider;
-            if (spCollider == null) return;
             collider = Undo.AddComponent<PolygonCollider2D>(tilemap.gameObject);
-            List<Vector2[]> shapes = new List<Vector2[]>();
-            Vector2 ofs = Vector2.zero;
-            var maker = new TilemapMakeCollider();
-            for (int y=0;y< tilemap.Height;++y)
+        }
+
+        var tiles = tilemap.Tiles;
+        var spCollider = tilemap.SpriteCollider;
+        if (spCollider == null) return;
+        List<Vector2[]> shapes = new List<Vector2[]>();
+        Vector2 ofs = Vector2.zero;
+        var maker = new TilemapMakeCollider();
+        for (int y = 0; y < tilemap.Height; ++y)
+        {
+            ofs.y = y * tilemap.TileSize;
+            for (int x = 0; x < tilemap.Width; ++x)
             {
-                ofs.y = y * tilemap.TileSize;
-                for (int x = 0; x < tilemap.Width; ++x)
+                ofs.x = x * tilemap.TileSize;
+                int idx = y * tilemap.Width + x;
+                int tileIdx = tiles[idx];
+                var cellInfo = spCollider.Get(tileIdx);
+                if (cellInfo == null) continue;
+                var shape = CellInfo.GetShape(cellInfo.Collision);
+                if (shape != null)
                 {
-                    ofs.x = x * tilemap.TileSize;
-                    int idx = y * tilemap.Width + x;
-                    int tileIdx = tiles[idx];
-                    var cellInfo = spCollider.Get(tileIdx);
-                    if (cellInfo == null) continue;
-                    var shape = CellInfo.GetShape(cellInfo.Collision);
-                    if (shape!=null)
+                    if (shape.Length == 2)
+                    {
+                        maker.AddLine(shape[0] + ofs, shape[1] + ofs);
+                    }
+                    else
                     {
                         for (int idEdge = 0; idEdge < shape.Length; ++idEdge)
                         {
@@ -404,13 +476,29 @@ public class DTileMapEditor : Editor
                     }
                 }
             }
-            maker.RemoveOverlapEdge();
-            collider.pathCount = maker.PathList.Count;
-            for(int idEdge=0;idEdge< maker.PathList.Count; ++idEdge)
-            {
-                collider.SetPath(idEdge, maker.PathList[idEdge]);
-            }
         }
+        maker.RemoveOverlapEdge();
+        maker.MergeLines();
+
+        collider.pathCount = maker.PolygonList.Count;
+        for (int idEdge = 0; idEdge < maker.PolygonList.Count; ++idEdge)
+        {
+            collider.SetPath(idEdge, maker.PolygonList[idEdge]);
+        }
+
+        // エッジコライダーをいったん消す
+        var edges = tilemap.GetComponents<EdgeCollider2D>();
+        foreach (var edge in edges)
+        {
+            DestroyImmediate(edge);
+        }
+        // エッジコライダーを追加
+        for (int idEdge = 0; idEdge < maker.EdgeList.Count; ++idEdge)
+        {
+            var edge = tilemap.gameObject.AddComponent<EdgeCollider2D>();
+            edge.SetPoints(maker.EdgeList[idEdge]);
+        }
+
     }
 
     public override void OnInspectorGUI()
