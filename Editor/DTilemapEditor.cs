@@ -490,12 +490,14 @@ public class DTileMapEditor : Editor
         var edges = tilemap.GetComponents<EdgeCollider2D>();
         foreach (var edge in edges)
         {
-            DestroyImmediate(edge);
+            Undo.DestroyObjectImmediate(edge);
+//            DestroyImmediate(edge);
         }
         // エッジコライダーを追加
         for (int idEdge = 0; idEdge < maker.EdgeList.Count; ++idEdge)
         {
-            var edge = tilemap.gameObject.AddComponent<EdgeCollider2D>();
+            var edge = Undo.AddComponent<EdgeCollider2D>(tilemap.gameObject);
+//            var edge = tilemap.gameObject.AddComponent<EdgeCollider2D>();
             edge.SetPoints(maker.EdgeList[idEdge]);
         }
 
