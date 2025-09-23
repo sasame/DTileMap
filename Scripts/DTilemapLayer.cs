@@ -49,7 +49,7 @@ namespace DTileMap
         {
             initMesh();
             RebuildMesh();
-            RenderTilemapToRT();
+//            RenderTilemapToRT();
         }
 
         private void OnEnable()
@@ -122,6 +122,8 @@ namespace DTileMap
             List<Vector2> uvs = new List<Vector2>();
             List<int> triangles = new List<int>();
 
+            float margin = (0.1f/ _spriteCollider.TilemapTexture.width);
+            float margin2 = margin*2f;
             for (int y = 0; y < _height; y++)
             {
                 for (int x = 0; x < _width; x++)
@@ -146,10 +148,10 @@ namespace DTileMap
                     //                    float uvSizeX = 1f / tilesX;
                     //                    float uvSizeY = 1f / tilesY;
 
-                    float u0 = tx / (float)tilesX;
-                    float v0 = ty / (float)tilesY;
-                    float u1 = (tx + 1) / (float)tilesX;
-                    float v1 = (ty + 1) / (float)tilesY;
+                    float u0 = (tx / (float)tilesX) + margin;
+                    float v0 = (ty / (float)tilesY) + margin;
+                    float u1 = ((tx + 1) / (float)tilesX) - margin2;
+                    float v1 = ((ty + 1) / (float)tilesY) - margin2;
 
                     uvs.Add(new Vector2(u0, v0));
                     uvs.Add(new Vector2(u1, v0));
