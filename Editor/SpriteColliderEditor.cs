@@ -182,13 +182,17 @@ public class SpriteColliderEditor : DGridBaseWindow
             {
                 var minPos = Vector2Int.Min(_regionFrom, _regionTo);
                 var maxPos = Vector2Int.Max(_regionFrom, _regionTo);
+                Undo.RecordObject(spCollider, "Change Collider");
                 spCollider.SetRange(minPos, maxPos, CellCollision.None);
+                EditorUtility.SetDirty(spCollider);
             });
             toolsMenu.AddItem(new GUIContent("Box"), false, () =>
             {
                 var minPos = Vector2Int.Min(_regionFrom, _regionTo);
                 var maxPos = Vector2Int.Max(_regionFrom, _regionTo);
+                Undo.RecordObject(spCollider, "Change Collider");
                 spCollider.SetRange(minPos, maxPos, CellCollision.Box);
+                EditorUtility.SetDirty(spCollider);
             });
             toolsMenu.DropDown(new Rect(0, 0, 0, 16));
             EditorGUIUtility.ExitGUI();
@@ -310,6 +314,7 @@ public class SpriteColliderEditor : DGridBaseWindow
                     {
                         var minPos = Vector2Int.Min(_regionFrom, _regionTo);
                         var maxPos = Vector2Int.Max(_regionFrom, _regionTo);
+                        Undo.RecordObject(spCollider, "Change Collider");
                         spCollider.SetRange(minPos, maxPos, (CellCollision)idCollision);
                         useMenu = true;
                     }
