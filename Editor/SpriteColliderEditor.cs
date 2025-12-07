@@ -175,6 +175,7 @@ public class SpriteColliderEditor : DGridBaseWindow
         bool useButton = false;
         EditorGUILayout.BeginHorizontal(EditorStyles.toolbar, GUILayout.ExpandWidth(true));
         // File menu
+        // Edit
         if (GUILayout.Button("Edit", EditorStyles.toolbarDropDown, GUILayout.Width(70)))
         {
             GenericMenu toolsMenu = new GenericMenu();
@@ -197,6 +198,32 @@ public class SpriteColliderEditor : DGridBaseWindow
             toolsMenu.DropDown(new Rect(0, 0, 0, 16));
             EditorGUIUtility.ExitGUI();
         }
+        // Attribute
+        if (GUILayout.Button("Attribute", EditorStyles.toolbarDropDown, GUILayout.Width(70)))
+        {
+            GenericMenu toolsMenu = new GenericMenu();
+            toolsMenu.AddItem(new GUIContent("None"), false, () =>
+            {
+                var minPos = Vector2Int.Min(_regionFrom, _regionTo);
+                var maxPos = Vector2Int.Max(_regionFrom, _regionTo);
+                spCollider.SetRangeAttribute(minPos, maxPos, "");
+            });
+            toolsMenu.AddItem(new GUIContent("Grass"), false, () =>
+            {
+                var minPos = Vector2Int.Min(_regionFrom, _regionTo);
+                var maxPos = Vector2Int.Max(_regionFrom, _regionTo);
+                spCollider.SetRangeAttribute(minPos, maxPos, "Grass");
+            });
+            toolsMenu.AddItem(new GUIContent("Stone"), false, () =>
+            {
+                var minPos = Vector2Int.Min(_regionFrom, _regionTo);
+                var maxPos = Vector2Int.Max(_regionFrom, _regionTo);
+                spCollider.SetRangeAttribute(minPos, maxPos, "Stone");
+            });
+            toolsMenu.DropDown(new Rect(0, 0, 0, 16));
+            EditorGUIUtility.ExitGUI();
+        }
+
         /*            else if (GUILayout.Button("Decimal", EditorStyles.toolbarDropDown, GUILayout.Width(70)))
                     {
                         GenericMenu toolsMenu = new GenericMenu();
@@ -297,14 +324,14 @@ public class SpriteColliderEditor : DGridBaseWindow
                 foreach (var item in list)
                 {
                     var pos = GetCanvasPosition(item.Position);
-                    //                        var size = GetCanvasPosition(item.Position + Vector2.one) - pos;// GetCanvasSize(Vector2.one * 0.5f);
                     var size = GetCanvasSize(Vector2.one);
-                    //                        size.y = Mathf.Abs(size.y);
                     GUI.DrawTexture(new Rect(pos.x + size.x * (1f - iconSize) * 0.5f, pos.y - size.y + ((1f - iconSize) * size.y * 0.5f), size.x * iconSize, size.y * iconSize), _arrayIcons[(int)item.Collision]);
                 }
                 GUI.color = Color.white;
 
                 bool useMenu = drawDropdownMenu(spCollider);
+                var minPos = Vector2Int.Min(_regionFrom, _regionTo);
+                var maxPos = Vector2Int.Max(_regionFrom, _regionTo);
 
                 GUILayout.BeginHorizontal();
                 for (int idCollision = 0; idCollision < _arrayIcons.Length; ++idCollision)
@@ -312,8 +339,6 @@ public class SpriteColliderEditor : DGridBaseWindow
                     var item = _arrayIcons[idCollision];
                     if (GUILayout.Button(item))
                     {
-                        var minPos = Vector2Int.Min(_regionFrom, _regionTo);
-                        var maxPos = Vector2Int.Max(_regionFrom, _regionTo);
                         Undo.RecordObject(spCollider, "Change Collider");
                         spCollider.SetRange(minPos, maxPos, (CellCollision)idCollision);
                         useMenu = true;
@@ -326,6 +351,14 @@ public class SpriteColliderEditor : DGridBaseWindow
                 {
                     guiControl(e);
                 }
+
+                var att = new HashSet<string>();
+                spCollider.ApplyRange(minPos, maxPos, cellInfo => {
+                    if (!string.IsNullOrEmpty(cellInfo.Attribute)) att.Add(cellInfo.Attribute);
+                });
+                string s = "";
+                foreach(var a in att) s += a + " ";
+                GUI.Label(new Rect(0, 150, 500, 32), s);
             }
 
             drawSelectionRect();

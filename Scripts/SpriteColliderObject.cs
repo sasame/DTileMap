@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -47,6 +48,7 @@ namespace DTileMap
     {
         [SerializeField] Vector2Int _pos;
         [SerializeField] CellCollision _collision;
+        [SerializeField] string _attribute;
 
         public Vector2Int Position
         {
@@ -57,6 +59,11 @@ namespace DTileMap
         {
             get { return _collision; }
             set { _collision = value; }
+        }
+        public string Attribute
+        {
+            get { return _attribute; }
+            set { _attribute = value; }
         }
 
         public override string ToString()
@@ -145,6 +152,28 @@ namespace DTileMap
             return _listInfo;
         }
 
+        // 範囲に対してアクションを適用
+        public void ApplyRange(Vector2Int min, Vector2Int max,Action<CellInfo> action)
+        {
+            var maxWidth = Mathf.CeilToInt(_tilemapTexture.width / _cellWidth);
+            var maxHeight = Mathf.CeilToInt(_tilemapTexture.height / _cellHeight);
+            for (int y = min.y; y <= max.y; ++y)
+            {
+                if ((y < 0) || (y >= maxHeight)) continue;
+                for (int x = min.x; x <= max.x; ++x)
+                {
+                    if ((x < 0) || (x >= maxWidth)) continue;
+                    var pos = new Vector2Int(x, y);
+                    var item = _listInfo.FirstOrDefault(t => t.Position == pos);
+                    if (item != null)
+                    {
+                        action(item);
+                    }
+                }
+            }
+        }
+
+        // コリジョンの設定
         public void SetRange(Vector2Int min, Vector2Int max, CellCollision col)
         {
             var maxWidth = Mathf.CeilToInt(_tilemapTexture.width / _cellWidth);
@@ -169,5 +198,31 @@ namespace DTileMap
                 }
             }
         }
+        // アトリビュートの設定
+        public void SetRangeAttribute(Vector2Int min, Vector2Int max, string attribute)
+        {
+            var maxWidth = Mathf.CeilToInt(_tilemapTexture.width / _cellWidth);
+            var maxHeight = Mathf.CeilToInt(_tilemapTexture.height / _cellHeight);
+            for (int y = min.y; y <= max.y; ++y)
+            {
+                if ((y < 0) || (y >= maxHeight)) continue;
+                for (int x = min.x; x <= max.x; ++x)
+                {
+                    if ((x < 0) || (x >= maxWidth)) continue;
+
+                    var pos = new Vector2Int(x, y);
+                    var item = _listInfo.FirstOrDefault(t => t.Position == pos);
+                    if (item != null)
+                    {
+                        item.Attribute = attribute;
+                    }
+                    else
+                    {
+                        _listInfo.Add(new CellInfo() { Position = pos, Attribute = attribute });
+                    }
+                }
+            }
+        }
+
     }
 }
