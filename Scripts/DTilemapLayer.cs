@@ -38,7 +38,7 @@ namespace DTileMap
         }
 
         // セル情報を取得
-        CellInfo GetCellInfo(Vector2Int pos)
+        public CellInfo GetCellInfo(Vector2Int pos)
         {
             if (pos.x < 0) return null;
             if (pos.y < 0) return null;
