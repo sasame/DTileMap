@@ -97,7 +97,10 @@ namespace DTileMap
             GL.LoadProjectionMatrix(Matrix4x4.Ortho(0, 1, 0, 1, -1, 1));
 
             // メッシュを描画
-            Graphics.DrawMeshNow(_mesh, Matrix4x4.identity);
+            if (_mesh != null)
+            {
+                Graphics.DrawMeshNow(_mesh, Matrix4x4.identity);
+            }
 
             GL.PopMatrix();
 
@@ -116,7 +119,6 @@ namespace DTileMap
             if (_tiles.Length != _width * _height)
             {
                 ResizeTiles();
-                initMesh();
             }
 
             int idx = x + y * _width;
@@ -179,6 +181,7 @@ namespace DTileMap
                 }
             }
 
+            initMesh();
             _mesh.Clear();
             _mesh.SetVertices(vertices);
             _mesh.SetUVs(0, uvs);

@@ -6,8 +6,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using DTileMap;
-
-
+using System.IO;
 
 
 class TilemapMakeCollider
@@ -519,6 +518,7 @@ public class DTileMapEditor : Editor
             makeCollider();
         }
     }
+
 
 }
 
