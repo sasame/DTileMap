@@ -37,6 +37,17 @@ namespace DTileMap
             get { return _collision; }
         }
 
+        // セル情報を取得
+        public CellInfo GetCellInfo(Vector2Int pos)
+        {
+            if (pos.x < 0) return null;
+            if (pos.y < 0) return null;
+            if (pos.x >= _width) return null;
+            if (pos.y >= _height) return null;
+            var idx = _tiles[pos.x + pos.y * _width];
+            return _spriteCollider.Get(idx);
+        }
+
         void initMesh()
         {
             //            _tiles = new int[_width * _height];
