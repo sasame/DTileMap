@@ -200,8 +200,6 @@ public class DTileMapEditor : Editor
         var window = EditorWindow.GetWindow<DTilemapEditorWindow>();
         if (window)
         {
-            Undo.RecordObject(tilemap, "Change Tile");
-
             var sel = window.GetSelctionTile();
             for (int y = sel.Item1.y; y <= sel.Item2.y; ++y)
             {
@@ -212,7 +210,7 @@ public class DTileMapEditor : Editor
                     tilemap.SetTile(pos.x + ofsx, pos.y + ofsy, x + y * spCollider.CellCountX);
                 }
             }
-            EditorUtility.SetDirty(tilemap);
+            tilemap.RebuildMesh();
         }
     }
 
@@ -267,7 +265,8 @@ public class DTileMapEditor : Editor
 
             if (EditorWindow.HasOpenInstances<DTilemapEditorWindow>())
             {
-                var window = EditorWindow.GetWindow<DTilemapEditorWindow>();
+                var window = Resources.FindObjectsOfTypeAll<DTilemapEditorWindow>().FirstOrDefault();
+//                var window = EditorWindow.GetWindow<DTilemapEditorWindow>();
                 var sel = window.GetSelctionTile();
                 var dif = sel.Item2 - sel.Item1;
                 var sizeX = dif.x + 1f;
@@ -284,6 +283,7 @@ public class DTileMapEditor : Editor
         {
             // 左クリック押し始め → ペイント開始
             _isPainting = true;
+            Undo.RecordObject(tilemap, "Change Tile");
             paint(basePos);
 //            e.Use(); // ← Unityの選択イベントを奪う
         }
@@ -297,7 +297,8 @@ public class DTileMapEditor : Editor
         {
             // ボタン離したら終了
             _isPainting = false;
-//            e.Use();
+            EditorUtility.SetDirty(tilemap);
+            //            e.Use();
         }
         else if (e.type == EventType.Used)
         {
@@ -306,16 +307,18 @@ public class DTileMapEditor : Editor
         }
         else if (e.type == EventType.Layout)
         {
+            tilemap.RebuildMesh();
         }
         else if (e.type == EventType.MouseMove)
         {
+            SceneView.RepaintAll();
         }
         else
         {
 //            Debug.Log("other event:" + e.type);
         }
 
-        SceneView.RepaintAll();
+//        SceneView.RepaintAll();
         Handles.matrix = prevMatrix;
     }
 
@@ -333,7 +336,7 @@ public class DTileMapEditor : Editor
         Handles.DrawAAConvexPolygon(a, b, c, d);
     }
 
-    void displayCollider()
+/*    void displayCollider()
     {
         DTilemapLayer tilemap = (DTilemapLayer)target;
         var spCollider = tilemap.SpriteCollider;
@@ -432,7 +435,7 @@ public class DTileMapEditor : Editor
             }
         }
         Handles.color = Color.gray;
-    }
+    }*/
 
     void makeCollider()
     {

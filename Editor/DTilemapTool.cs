@@ -26,11 +26,11 @@ namespace DEditor
             Handles.DrawWireCube(Vector3.zero, Vector3.one * 2);
 
             // Sceneビューのイベントを拾って独自操作も可能
-            Event e = Event.current;
+/*            Event e = Event.current;
             if (e.type == EventType.MouseDown && e.button == 0)
             {
                 Debug.Log("Clicked in SceneView!");
-            }
+            }*/
         }
     }
 

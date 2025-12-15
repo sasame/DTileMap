@@ -110,10 +110,10 @@ namespace DTileMap
 
             int idx = x + y * _width;
             _tiles[idx] = tileId;
-            RebuildMesh(); // 今は全更新（後で最適化可）
+//            RebuildMesh(); // 今は全更新（後で最適化可）
         }
 
-        void RebuildMesh()
+        public void RebuildMesh()
         {
             int tilesX = Mathf.CeilToInt(_spriteCollider.TilemapTexture.width / _spriteCollider.CellWidth);
             int tilesY = Mathf.CeilToInt(_spriteCollider.TilemapTexture.height / _spriteCollider.CellHeight);
