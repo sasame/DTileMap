@@ -503,6 +503,7 @@ public class DTileMapEditor : Editor
             edge.SetPoints(maker.EdgeList[idEdge]);
         }
 
+        EditorUtility.SetDirty(collider);
     }
 
     public override void OnInspectorGUI()

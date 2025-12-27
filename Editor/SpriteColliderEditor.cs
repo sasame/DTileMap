@@ -175,6 +175,19 @@ public class SpriteColliderEditor : DGridBaseWindow
         bool useButton = false;
         EditorGUILayout.BeginHorizontal(EditorStyles.toolbar, GUILayout.ExpandWidth(true));
         // File menu
+        // File
+        if (GUILayout.Button("File", EditorStyles.toolbarDropDown, GUILayout.Width(70)))
+        {
+            GenericMenu toolsMenu = new GenericMenu();
+            toolsMenu.AddItem(new GUIContent("Save"), false, () =>
+            {
+                EditorUtility.SetDirty(spCollider);
+                AssetDatabase.SaveAssetIfDirty(spCollider);
+            });
+            toolsMenu.DropDown(new Rect(0, 0, 0, 16));
+            EditorGUIUtility.ExitGUI();
+        }
+
         // Edit
         if (GUILayout.Button("Edit", EditorStyles.toolbarDropDown, GUILayout.Width(70)))
         {
