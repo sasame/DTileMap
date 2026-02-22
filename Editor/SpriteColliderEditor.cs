@@ -13,6 +13,7 @@ public class SpriteColliderEditor : DGridBaseWindow
     {
         None,
         Region,
+        Move,
         //            File,
         //            Item,
     }
@@ -113,6 +114,10 @@ public class SpriteColliderEditor : DGridBaseWindow
                     case DragType.Region:
                         _regionTo = Vector2Int.FloorToInt(GetLocalPosition(e.mousePosition));
                         break;
+                    case DragType.Move:
+                        ViewMove(e);
+                        e.Use();
+                        break;
                 }
                 //                    modifySelection();
                 e.Use();
@@ -133,7 +138,14 @@ public class SpriteColliderEditor : DGridBaseWindow
                 //                    modifySelection();
                 _regionFrom = Vector2Int.FloorToInt(GetLocalPosition(e.mousePosition));
                 _regionTo = Vector2Int.FloorToInt(GetLocalPosition(e.mousePosition));
-                _dragType = DragType.Region;
+                if (e.keyCode == KeyCode.LeftControl)
+                {
+                    _dragType = DragType.Move;
+                }
+                else
+                {
+                    _dragType = DragType.Region;
+                }
             }
         }
         else if (e.type == EventType.MouseUp)
@@ -232,6 +244,12 @@ public class SpriteColliderEditor : DGridBaseWindow
                 var minPos = Vector2Int.Min(_regionFrom, _regionTo);
                 var maxPos = Vector2Int.Max(_regionFrom, _regionTo);
                 spCollider.SetRangeAttribute(minPos, maxPos, "Stone");
+            });
+            toolsMenu.AddItem(new GUIContent("SlipStone"), false, () =>
+            {
+                var minPos = Vector2Int.Min(_regionFrom, _regionTo);
+                var maxPos = Vector2Int.Max(_regionFrom, _regionTo);
+                spCollider.SetRangeAttribute(minPos, maxPos, "SlipStone");
             });
             toolsMenu.DropDown(new Rect(0, 0, 0, 16));
             EditorGUIUtility.ExitGUI();
