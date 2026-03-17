@@ -128,6 +128,8 @@ namespace DTileMap
 
         public void RebuildMesh()
         {
+            if (_spriteCollider == null) return;
+
             int tilesX = Mathf.CeilToInt(_spriteCollider.TilemapTexture.width / _spriteCollider.CellWidth);
             int tilesY = Mathf.CeilToInt(_spriteCollider.TilemapTexture.height / _spriteCollider.CellHeight);
 
@@ -219,6 +221,26 @@ namespace DTileMap
             }
 
             return hit;
+        }
+
+        public void Resize(int newWidth, int newHeight)
+        {
+            var newTiles = new int[newWidth * newHeight];
+            int minWidth = Mathf.Min(_width,newWidth);
+            int minHeight = Mathf.Min(_height, newHeight);
+            for(int y=0;y<minHeight;++y)
+            {
+                for (int x = 0; x < minWidth; ++x)
+                {
+                    newTiles[x + y * newWidth] = _tiles[x + y * _width];
+                }
+            }
+            // set new
+            _width = newWidth;
+            _height = newHeight;
+            _tiles = newTiles;
+
+            RebuildMesh();
         }
 
     }

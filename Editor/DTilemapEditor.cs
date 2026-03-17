@@ -518,6 +518,12 @@ public class DTileMapEditor : Editor
         {
             makeCollider();
         }
+        if (GUILayout.Button("Resize"))
+        {
+            SizeInputDialog.Show((w, h) => {
+                tilemap.Resize(w, h);
+            }, tilemap.Width, tilemap.Height);
+        }
     }
 
 
