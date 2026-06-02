@@ -8,7 +8,7 @@ using DTileMap;
 
 namespace DEditor
 {
-    [EditorTool("DTilemapTool",typeof(DTilemapLayer))]
+    [EditorTool("Tilemap Tool",typeof(DTilemapLayer))]
     public class DTilemapTool : EditorTool
     {
         public Texture2D _toolIcon;
@@ -23,7 +23,7 @@ namespace DEditor
                 {
                     _toolIcon = Resources.Load<Texture2D>("TilemapToolIcon");
                 }
-                return new GUIContent(_toolIcon);
+                return new GUIContent("Tile",_toolIcon,"Tilemap Tool");
             }
         }
 

@@ -25,6 +25,8 @@ public class SpriteColliderEditor : DGridBaseWindow
     GUISkin _guiSkin;
     Vector2Int _regionFrom;
     Vector2Int _regionTo;
+    // selection
+    SpriteColliderObject _prevSelection;
 
     [MenuItem("Window/SpriteColliderEditor")]
     public static void Init()
@@ -327,6 +329,21 @@ public class SpriteColliderEditor : DGridBaseWindow
 
         EditorGUI.BeginChangeCheck();
 
+        SpriteColliderObject activeSelection = null;
+        if (Selection.activeObject)
+        {
+            var spCollider = Selection.activeObject as SpriteColliderObject;
+            activeSelection = spCollider;
+        }
+
+        if (_prevSelection != activeSelection)
+        {
+            _prevSelection = activeSelection;
+            var tex = activeSelection.TilemapTexture;
+            var corner = new Vector2(tex.width / activeSelection.CellWidth, tex.height / activeSelection.CellHeight);
+            ViewFraming(new Rect(0f, 0f, corner.x, corner.y), true);
+        }
+
         // grid
         DrawGrid();
         // string
@@ -336,61 +353,59 @@ public class SpriteColliderEditor : DGridBaseWindow
                     }
                     drawSelectInfo();
         */
-//        Debug.Log(Selection.activeObject);
-        if (Selection.activeObject)
+        //        Debug.Log(Selection.activeObject);
+        if (activeSelection)
         {
-            var spCollider = Selection.activeObject as SpriteColliderObject;
-            if (spCollider && spCollider.TilemapTexture)
+            var spCollider = activeSelection;
+            var tex = spCollider.TilemapTexture;
             {
-                var tex = spCollider.TilemapTexture;
-                {
-                    var from = GetCanvasPosition(new Vector2(0f, tex.height / spCollider.CellHeight));
-                    var size = GetCanvasPosition(new Vector2(tex.width / spCollider.CellWidth, 0f)) - from;
-                    GUI.DrawTexture(new Rect(from.x, from.y, size.x, size.y), tex);
-                }
-
-                var list = spCollider.GetCellInfoList();
-                GUI.color = new Color(1f, 1f, 1f, 0.5f);
-                float iconSize = 0.6f;
-                foreach (var item in list)
-                {
-                    var pos = GetCanvasPosition(item.Position);
-                    var size = GetCanvasSize(Vector2.one);
-                    GUI.DrawTexture(new Rect(pos.x + size.x * (1f - iconSize) * 0.5f, pos.y - size.y + ((1f - iconSize) * size.y * 0.5f), size.x * iconSize, size.y * iconSize), _arrayIcons[(int)item.Collision]);
-                }
-                GUI.color = Color.white;
-
-                bool useMenu = drawDropdownMenu(spCollider);
-                var minPos = Vector2Int.Min(_regionFrom, _regionTo);
-                var maxPos = Vector2Int.Max(_regionFrom, _regionTo);
-
-                GUILayout.BeginHorizontal();
-                for (int idCollision = 0; idCollision < _arrayIcons.Length; ++idCollision)
-                {
-                    var item = _arrayIcons[idCollision];
-                    if (GUILayout.Button(item))
-                    {
-                        Undo.RecordObject(spCollider, "Change Collider");
-                        spCollider.SetRange(minPos, maxPos, (CellCollision)idCollision);
-                        useMenu = true;
-                    }
-                }
-                GUILayout.EndHorizontal();
-                //                    GUILayout.Toolbar(1, _arrayIcons);
-
-                if (useMenu == false)
-                {
-                    guiControl(e);
-                }
-
-                var att = new HashSet<string>();
-                spCollider.ApplyRange(minPos, maxPos, cellInfo => {
-                    if (!string.IsNullOrEmpty(cellInfo.Attribute)) att.Add(cellInfo.Attribute);
-                });
-                string s = "";
-                foreach(var a in att) s += a + " ";
-                GUI.Label(new Rect(0, 150, 500, 32), s);
+                var from = GetCanvasPosition(new Vector2(0f, tex.height / spCollider.CellHeight));
+                var size = GetCanvasPosition(new Vector2(tex.width / spCollider.CellWidth, 0f)) - from;
+                GUI.DrawTexture(new Rect(from.x, from.y, size.x, size.y), tex);
             }
+
+            var list = spCollider.GetCellInfoList();
+            GUI.color = new Color(1f, 1f, 1f, 0.5f);
+            float iconSize = 0.6f;
+            foreach (var item in list)
+            {
+                var pos = GetCanvasPosition(item.Position);
+                var size = GetCanvasSize(Vector2.one);
+                GUI.DrawTexture(new Rect(pos.x + size.x * (1f - iconSize) * 0.5f, pos.y - size.y + ((1f - iconSize) * size.y * 0.5f), size.x * iconSize, size.y * iconSize), _arrayIcons[(int)item.Collision]);
+            }
+            GUI.color = Color.white;
+
+            bool useMenu = drawDropdownMenu(spCollider);
+            var minPos = Vector2Int.Min(_regionFrom, _regionTo);
+            var maxPos = Vector2Int.Max(_regionFrom, _regionTo);
+
+            GUILayout.BeginHorizontal();
+            for (int idCollision = 0; idCollision < _arrayIcons.Length; ++idCollision)
+            {
+                var item = _arrayIcons[idCollision];
+                if (GUILayout.Button(item))
+                {
+                    Undo.RecordObject(spCollider, "Change Collider");
+                    spCollider.SetRange(minPos, maxPos, (CellCollision)idCollision);
+                    useMenu = true;
+                }
+            }
+            GUILayout.EndHorizontal();
+            //                    GUILayout.Toolbar(1, _arrayIcons);
+
+            if (useMenu == false)
+            {
+                guiControl(e);
+            }
+
+            var att = new HashSet<string>();
+            spCollider.ApplyRange(minPos, maxPos, cellInfo =>
+            {
+                if (!string.IsNullOrEmpty(cellInfo.Attribute)) att.Add(cellInfo.Attribute);
+            });
+            string s = "";
+            foreach (var a in att) s += a + " ";
+            GUI.Label(new Rect(0, 150, 500, 32), s);
 
             drawSelectionRect();
         }

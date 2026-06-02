@@ -20,6 +20,7 @@ public class DTilemapEditorWindow : DGridBaseWindow
     DragType _dragType = DragType.None;
     Vector2Int _regionFrom;
     Vector2Int _regionTo;
+    DTilemapLayer _prevSelection = null;
 
     // GUISkin
     GUISkin _guiSkin;
@@ -134,29 +135,40 @@ public class DTilemapEditorWindow : DGridBaseWindow
 
         EditorGUI.BeginChangeCheck();
 
+        DTilemapLayer activeLayer = null;
+        if (Selection.activeObject)
+        {
+            activeLayer = Selection.activeGameObject.GetComponent<DTilemapLayer>();
+        }
+
+        if (activeLayer != _prevSelection)
+        {
+            _prevSelection = activeLayer;
+            var spCollider = activeLayer.SpriteCollider;
+            var tex = spCollider.TilemapTexture;
+            var corner = new Vector2(tex.width / spCollider.CellWidth, tex.height / spCollider.CellHeight);
+            ViewFraming(new Rect(0f,0f, corner.x, corner.y),true);
+            Debug.Log(corner);
+        }
+
         // grid
         DrawGrid();
 
-        if (Selection.activeObject)
+        if (activeLayer)
         {
-            var layer = Selection.activeGameObject.GetComponent<DTilemapLayer>();
-            if (layer)
+            var spCollider = activeLayer.SpriteCollider;
+            var tex = spCollider.TilemapTexture;
+            if (tex)
             {
-//                Debug.Log("exist layer:" + layer.name);
-                var spCollider = layer.SpriteCollider;
-                var tex = spCollider.TilemapTexture;
-                if (tex)
-                {
-                    var from = GetCanvasPosition(new Vector2(0f, tex.height / spCollider.CellHeight));
-                    var size = GetCanvasPosition(new Vector2(tex.width / spCollider.CellWidth, 0f)) - from;
-                    GUI.color = Color.white;
-                    GUI.DrawTexture(new Rect(from.x, from.y, size.x, size.y), tex);
-                }
-                guiControl(e);
-                GUI.Label(new Rect(0, 100, 500, 32), _regionFrom + " : " + _regionTo);
-
-                drawSelectionRect();
+                var from = GetCanvasPosition(new Vector2(0f, tex.height / spCollider.CellHeight));
+                var size = GetCanvasPosition(new Vector2(tex.width / spCollider.CellWidth, 0f)) - from;
+                GUI.color = Color.white;
+                GUI.DrawTexture(new Rect(from.x, from.y, size.x, size.y), tex);
             }
+            guiControl(e);
+            GUI.Label(new Rect(0, 100, 500, 32), _regionFrom + " : " + _regionTo);
+
+            drawSelectionRect();
         }
 
         if (EditorGUI.EndChangeCheck())
