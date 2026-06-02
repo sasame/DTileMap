@@ -1,0 +1,108 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f84116921cb4db14e99d0c36e617c1ea, type: 3}
+  m_Name: SpriteColliderObject
+  m_EditorClassIdentifier: DTileMap::DTileMap.SpriteColliderObject
+  _tilemapTexture: {fileID: 2800000, guid: 854e6ab9f59bbd244a3dd183cdd713ef, type: 3}
+  _cellWidth: 16
+  _cellHeight: 16
+  _listInfo:
+  - _pos: {x: 0, y: 0}
+    _collision: 0
+    _attribute: 
+  - _pos: {x: 1, y: 0}
+    _collision: 1
+    _attribute: 
+  - _pos: {x: 2, y: 0}
+    _collision: 2
+    _attribute: 
+  - _pos: {x: 3, y: 0}
+    _collision: 3
+    _attribute: 
+  - _pos: {x: 4, y: 0}
+    _collision: 4
+    _attribute: 
+  - _pos: {x: 5, y: 0}
+    _collision: 5
+    _attribute: 
+  - _pos: {x: 6, y: 0}
+    _collision: 6
+    _attribute: 
+  - _pos: {x: 7, y: 0}
+    _collision: 7
+    _attribute: 
+  - _pos: {x: 0, y: 1}
+    _collision: 8
+    _attribute: 
+  - _pos: {x: 1, y: 1}
+    _collision: 9
+    _attribute: 
+  - _pos: {x: 2, y: 1}
+    _collision: 10
+    _attribute: 
+  - _pos: {x: 3, y: 1}
+    _collision: 11
+    _attribute: 
+  - _pos: {x: 4, y: 1}
+    _collision: 12
+    _attribute: 
+  - _pos: {x: 5, y: 1}
+    _collision: 13
+    _attribute: 
+  - _pos: {x: 6, y: 1}
+    _collision: 14
+    _attribute: 
+  - _pos: {x: 7, y: 1}
+    _collision: 15
+    _attribute: 
+  - _pos: {x: 0, y: 2}
+    _collision: 16
+    _attribute: 
+  - _pos: {x: 1, y: 2}
+    _collision: 17
+    _attribute: 
+  - _pos: {x: 2, y: 2}
+    _collision: 18
+    _attribute: 
+  - _pos: {x: 3, y: 2}
+    _collision: 19
+    _attribute: 
+  - _pos: {x: 4, y: 2}
+    _collision: 20
+    _attribute: 
+  - _pos: {x: 5, y: 2}
+    _collision: 21
+    _attribute: 
+  - _pos: {x: 6, y: 2}
+    _collision: 22
+    _attribute: 
+  - _pos: {x: 7, y: 2}
+    _collision: 23
+    _attribute: 
+  - _pos: {x: 0, y: 3}
+    _collision: 24
+    _attribute: 
+  - _pos: {x: 1, y: 3}
+    _collision: 25
+    _attribute: 
+  - _pos: {x: 2, y: 3}
+    _collision: 26
+    _attribute: 
+  - _pos: {x: 3, y: 3}
+    _collision: 27
+    _attribute: 
+  - _pos: {x: 4, y: 3}
+    _collision: 28
+    _attribute: 
+  - _pos: {x: 5, y: 3}
+    _collision: 29
+    _attribute: 

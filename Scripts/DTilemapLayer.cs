@@ -109,6 +109,7 @@ namespace DTileMap
         public void ResizeTiles()
         {
             _tiles = new int[_width * _height];
+            for (int i = 0; i < _tiles.Length; ++i) _tiles[i] = -1; // -1 = 空白
         }
 
         public void SetTile(int x, int y, int tileId)
@@ -226,6 +227,7 @@ namespace DTileMap
         public void Resize(int newWidth, int newHeight)
         {
             var newTiles = new int[newWidth * newHeight];
+            for (int i = 0; i < newTiles.Length; ++i) newTiles[i] = -1; // -1 = 空白
             int minWidth = Mathf.Min(_width,newWidth);
             int minHeight = Mathf.Min(_height, newHeight);
             for(int y=0;y<minHeight;++y)
