@@ -148,7 +148,6 @@ public class DTilemapEditorWindow : DGridBaseWindow
             var tex = spCollider.TilemapTexture;
             var corner = new Vector2(tex.width / spCollider.CellWidth, tex.height / spCollider.CellHeight);
             ViewFraming(new Rect(0f,0f, corner.x, corner.y),true);
-            Debug.Log(corner);
         }
 
         // grid

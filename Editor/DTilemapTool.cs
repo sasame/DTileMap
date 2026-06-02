@@ -59,8 +59,8 @@ namespace DEditor
         public override void OnToolGUI(EditorWindow editorWindow)
         {
             // Sceneビュー上での描画や操作を記述
-            Handles.color = Color.red;
-            Handles.DrawWireCube(Vector3.zero, Vector3.one * 2);
+//            Handles.color = Color.red;
+//            Handles.DrawWireCube(Vector3.zero, Vector3.one * 2);
 
             DTilemapLayer tilemap = (DTilemapLayer)target;
             var prevMatrix = Handles.matrix;
