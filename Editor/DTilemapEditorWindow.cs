@@ -144,10 +144,13 @@ public class DTilemapEditorWindow : DGridBaseWindow
         if (activeLayer != _prevSelection)
         {
             _prevSelection = activeLayer;
-            var spCollider = activeLayer.SpriteCollider;
-            var tex = spCollider.TilemapTexture;
-            var corner = new Vector2(tex.width / spCollider.CellWidth, tex.height / spCollider.CellHeight);
-            ViewFraming(new Rect(0f,0f, corner.x, corner.y),true);
+            if (activeLayer != null)
+            {
+                var spCollider = activeLayer.SpriteCollider;
+                var tex = spCollider.TilemapTexture;
+                var corner = new Vector2(tex.width / spCollider.CellWidth, tex.height / spCollider.CellHeight);
+                ViewFraming(new Rect(0f, 0f, corner.x, corner.y), true);
+            }
         }
 
         // grid

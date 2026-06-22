@@ -338,10 +338,10 @@ public class DTileMapEditor : Editor
         var maker = new TilemapMakeCollider();
         for (int y = 0; y < tilemap.Height; ++y)
         {
-            ofs.y = y * tilemap.TileSize;
+            ofs.y = y;// * tilemap.TileSize;
             for (int x = 0; x < tilemap.Width; ++x)
             {
-                ofs.x = x * tilemap.TileSize;
+                ofs.x = x;// * tilemap.TileSize;
                 int idx = y * tilemap.Width + x;
                 int tileIdx = tiles[idx];
                 var cellInfo = spCollider.Get(tileIdx);
@@ -369,7 +369,9 @@ public class DTileMapEditor : Editor
         collider.pathCount = maker.PolygonList.Count;
         for (int idEdge = 0; idEdge < maker.PolygonList.Count; ++idEdge)
         {
-            collider.SetPath(idEdge, maker.PolygonList[idEdge]);
+            var poly = maker.PolygonList[idEdge];
+            var scaledPoly = poly.ConvertAll<Vector2>(v => v * tilemap.TileSize);
+            collider.SetPath(idEdge, scaledPoly);
         }
 
         // エッジコライダーをいったん消す
@@ -377,14 +379,14 @@ public class DTileMapEditor : Editor
         foreach (var edge in edges)
         {
             Undo.DestroyObjectImmediate(edge);
-//            DestroyImmediate(edge);
         }
         // エッジコライダーを追加
         for (int idEdge = 0; idEdge < maker.EdgeList.Count; ++idEdge)
         {
             var edge = Undo.AddComponent<EdgeCollider2D>(tilemap.gameObject);
-//            var edge = tilemap.gameObject.AddComponent<EdgeCollider2D>();
-            edge.SetPoints(maker.EdgeList[idEdge]);
+            var edgePoints = maker.EdgeList[idEdge];
+            var scaledEdge = edgePoints.ConvertAll<Vector2>(v => v * tilemap.TileSize);
+            edge.SetPoints(scaledEdge);
         }
 
         EditorUtility.SetDirty(collider);
