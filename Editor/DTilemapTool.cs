@@ -14,6 +14,7 @@ namespace DEditor
         public Texture2D _toolIcon;
         Vector3[] _tmpLines = null;
         bool _isPainting = false;
+        int _paintingCount = 0;
 
         public override GUIContent toolbarIcon
         {
@@ -87,7 +88,7 @@ namespace DEditor
             if (plane.Raycast(ray, out enter))
             {
                 var pos3D = ray.origin + ray.direction * enter;
-                basePos = Vector3Int.FloorToInt(tilemap.transform.worldToLocalMatrix.MultiplyPoint(pos3D));
+                basePos = Vector3Int.FloorToInt(tilemap.transform.worldToLocalMatrix.MultiplyPoint(pos3D) / tilemap.TileSize);
             }
 
             if (e.type == EventType.Repaint)
@@ -97,31 +98,32 @@ namespace DEditor
                 // 縦ライン
                 for (int i = 0; i <= tilemap.Width; ++i)
                 {
-                    _tmpLines[ofs++] = new Vector3(i, 0f, 0f);
-                    _tmpLines[ofs++] = new Vector3(i, tilemap.Height, 0f);
+                    _tmpLines[ofs++] = new Vector3(i, 0f, 0f) * tilemap.TileSize;
+                    _tmpLines[ofs++] = new Vector3(i, tilemap.Height, 0f) * tilemap.TileSize;
                 }
                 // 横ライン
                 for (int i = 0; i <= tilemap.Height; ++i)
                 {
-                    _tmpLines[ofs++] = new Vector3(0f, i, 0f);
-                    _tmpLines[ofs++] = new Vector3(tilemap.Width, i, 0f);
+                    _tmpLines[ofs++] = new Vector3(0f, i, 0f) * tilemap.TileSize;
+                    _tmpLines[ofs++] = new Vector3(tilemap.Width, i, 0f) * tilemap.TileSize;
                 }
                 Handles.color = new Color(0.5f, 0.5f, 0.5f, 0.5f);
                 Handles.DrawLines(_tmpLines);
 
+                var cursorPos = (Vector3)basePos * tilemap.TileSize;
                 if (EditorWindow.HasOpenInstances<DTilemapEditorWindow>())
                 {
                     var window = Resources.FindObjectsOfTypeAll<DTilemapEditorWindow>().FirstOrDefault();
                     //                var window = EditorWindow.GetWindow<DTilemapEditorWindow>();
                     var sel = window.GetSelctionTile();
                     var dif = sel.Item2 - sel.Item1;
-                    var sizeX = dif.x + 1f;
-                    var sizeY = dif.y + 1f;
-                    Handles.DrawAAConvexPolygon(basePos, basePos + Vector3.right * sizeX, basePos + new Vector3(dif.x + 1f, dif.y + 1f, 0f), basePos + Vector3.up * sizeY);
+                    var sizeX = (dif.x + 1f) * tilemap.TileSize;
+                    var sizeY = (dif.y + 1f) * tilemap.TileSize;
+                    Handles.DrawAAConvexPolygon(cursorPos, cursorPos + Vector3.right * sizeX, cursorPos + new Vector3(dif.x + 1f, dif.y + 1f, 0f) * tilemap.TileSize, cursorPos + Vector3.up * sizeY);
                 }
                 else
                 {
-                    Handles.DrawAAConvexPolygon(basePos, basePos + Vector3.right, basePos + new Vector3(1f, 1f, 0f), basePos + Vector3.up);
+                    Handles.DrawAAConvexPolygon(cursorPos, cursorPos + Vector3.right * tilemap.TileSize, cursorPos + new Vector3(1f, 1f, 0f) * tilemap.TileSize, cursorPos + Vector3.up * tilemap.TileSize);
                 }
 
             }
@@ -129,13 +131,16 @@ namespace DEditor
             {
                 // 左クリック押し始め → ペイント開始
                 _isPainting = true;
-                Undo.RecordObject(tilemap, "Change Tile");
+                Undo.RecordObject(tilemap, "Change Tile" + _paintingCount);
+                ++_paintingCount;
                 paint(basePos, e.control);
                 //            e.Use(); // ← Unityの選択イベントを奪う
             }
             else if (e.type == EventType.MouseDrag && e.button == 0 && _isPainting)
             {
                 // ドラッグ中もペイント
+                Undo.RecordObject(tilemap, "Change Tile" + _paintingCount);
+                ++_paintingCount;
                 paint(basePos,e.control);
                 //            e.Use(); // ← Unityの選択イベントを奪う
             }
@@ -144,6 +149,7 @@ namespace DEditor
                 // ボタン離したら終了
                 _isPainting = false;
                 EditorUtility.SetDirty(tilemap);
+                Undo.FlushUndoRecordObjects();
                 //            e.Use();
             }
             else if (e.type == EventType.Used)

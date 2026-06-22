@@ -136,7 +136,7 @@ public class DTilemapEditorWindow : DGridBaseWindow
         EditorGUI.BeginChangeCheck();
 
         DTilemapLayer activeLayer = null;
-        if (Selection.activeObject)
+        if (Selection.activeGameObject)
         {
             activeLayer = Selection.activeGameObject.GetComponent<DTilemapLayer>();
         }
