@@ -15,6 +15,8 @@ namespace DEditor
         Vector3[] _tmpLines = null;
         bool _isPainting = false;
         int _paintingCount = 0;
+        bool _isPan = false;
+        Vector2 _mousePrev = Vector2.zero;
 
         public override GUIContent toolbarIcon
         {
@@ -60,8 +62,10 @@ namespace DEditor
         public override void OnToolGUI(EditorWindow editorWindow)
         {
             // Sceneビュー上での描画や操作を記述
-//            Handles.color = Color.red;
-//            Handles.DrawWireCube(Vector3.zero, Vector3.one * 2);
+            //            Handles.color = Color.red;
+            //            Handles.DrawWireCube(Vector3.zero, Vector3.one * 2);
+
+            if (!(editorWindow is SceneView sceneView)) return;
 
             DTilemapLayer tilemap = (DTilemapLayer)target;
             var prevMatrix = Handles.matrix;
@@ -129,28 +133,64 @@ namespace DEditor
             }
             else if (e.type == EventType.MouseDown && e.button == 0)
             {
-                // 左クリック押し始め → ペイント開始
-                _isPainting = true;
-                Undo.RecordObject(tilemap, "Change Tile" + _paintingCount);
-                ++_paintingCount;
-                paint(basePos, e.control);
-                //            e.Use(); // ← Unityの選択イベントを奪う
+                _mousePrev = e.mousePosition;
+                if (e.alt)
+                {
+                    _isPan = true;
+                    e.Use(); // ← Unityの選択イベントを奪う
+                }
+                else
+                {
+                    // 左クリック押し始め → ペイント開始
+                    _isPainting = true;
+                    Undo.RecordObject(tilemap, "Change Tile" + _paintingCount);
+                    ++_paintingCount;
+                    paint(basePos, e.control);
+                }
             }
-            else if (e.type == EventType.MouseDrag && e.button == 0 && _isPainting)
+            else if (e.type == EventType.MouseDrag && e.button == 0)
             {
-                // ドラッグ中もペイント
-                Undo.RecordObject(tilemap, "Change Tile" + _paintingCount);
-                ++_paintingCount;
-                paint(basePos,e.control);
-                //            e.Use(); // ← Unityの選択イベントを奪う
+                if (_isPan)
+                {
+                    var prev = sceneView.camera.ScreenPointToRay(_mousePrev);
+                    var cur = sceneView.camera.ScreenPointToRay(e.mousePosition);
+                    if (sceneView.camera.orthographic)
+                    {
+                        Vector3 worldMove = cur.origin - prev.origin;
+                        worldMove.x = -worldMove.x;
+                        sceneView.pivot += worldMove;
+                    }
+                    else {
+                        float speedMultiplier = sceneView.size * 0.0015f;
+                        Vector3 localMove = new Vector3(-e.delta.x, e.delta.y, 0) * speedMultiplier;
+                        Vector3 worldMove = sceneView.camera.transform.TransformDirection(localMove);
+                        sceneView.pivot += worldMove;
+                    }
+                    e.Use();
+                    sceneView.Repaint();
+                }
+                else if (_isPainting)
+                {
+                    // ドラッグ中もペイント
+                    Undo.RecordObject(tilemap, "Change Tile" + _paintingCount);
+                    ++_paintingCount;
+                    paint(basePos, e.control);
+                }
+                _mousePrev = e.mousePosition;
             }
             else if (e.type == EventType.MouseUp && e.button == 0)
             {
-                // ボタン離したら終了
-                _isPainting = false;
-                EditorUtility.SetDirty(tilemap);
-                Undo.FlushUndoRecordObjects();
-                //            e.Use();
+                if (_isPan)
+                {
+                    _isPan = false;
+                }
+                else
+                {
+                    // ボタン離したら終了
+                    _isPainting = false;
+                    EditorUtility.SetDirty(tilemap);
+                    Undo.FlushUndoRecordObjects();
+                }
             }
             else if (e.type == EventType.Used)
             {
