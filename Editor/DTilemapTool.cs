@@ -35,7 +35,7 @@ namespace DEditor
             if (!EditorWindow.HasOpenInstances<DTilemapEditorWindow>()) return;
             DTilemapLayer tilemap = (DTilemapLayer)target;
             var spCollider = tilemap.SpriteCollider;
-            var window = EditorWindow.GetWindow<DTilemapEditorWindow>();
+            var window = EditorWindow.GetWindow<DTilemapEditorWindow>("DTilemapEditorWindow", false);
             if (window)
             {
                 var sel = window.GetSelctionTile();
@@ -83,6 +83,7 @@ namespace DEditor
 
             Event e = Event.current;
             HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Passive)); // ← 選択操作を無効化
+//            Debug.Log(editorWindow + ":" + e.type);
 
             Vector3Int basePos = Vector3Int.zero;
             // 
@@ -94,7 +95,7 @@ namespace DEditor
                 var pos3D = ray.origin + ray.direction * enter;
                 basePos = Vector3Int.FloorToInt(tilemap.transform.worldToLocalMatrix.MultiplyPoint(pos3D) / tilemap.TileSize);
             }
-
+            
             if (e.type == EventType.Repaint)
             {
                 _tmpLines = new Vector3[(tilemap.Width + 1) * 2 + (tilemap.Height + 1) * 2];
@@ -118,7 +119,6 @@ namespace DEditor
                 if (EditorWindow.HasOpenInstances<DTilemapEditorWindow>())
                 {
                     var window = Resources.FindObjectsOfTypeAll<DTilemapEditorWindow>().FirstOrDefault();
-                    //                var window = EditorWindow.GetWindow<DTilemapEditorWindow>();
                     var sel = window.GetSelctionTile();
                     var dif = sel.Item2 - sel.Item1;
                     var sizeX = (dif.x + 1f) * tilemap.TileSize;
@@ -129,7 +129,7 @@ namespace DEditor
                 {
                     Handles.DrawAAConvexPolygon(cursorPos, cursorPos + Vector3.right * tilemap.TileSize, cursorPos + new Vector3(1f, 1f, 0f) * tilemap.TileSize, cursorPos + Vector3.up * tilemap.TileSize);
                 }
-
+//                e.Use();
             }
             else if (e.type == EventType.MouseDown && e.button == 0)
             {
@@ -192,11 +192,6 @@ namespace DEditor
                     Undo.FlushUndoRecordObjects();
                 }
             }
-            else if (e.type == EventType.Used)
-            {
-                //
-                //            e.Use();
-            }
             else if (e.type == EventType.Layout)
             {
                 tilemap.RebuildMesh();
@@ -205,6 +200,12 @@ namespace DEditor
             {
                 SceneView.RepaintAll();
             }
+//            else if (e.type == EventType.KeyDown && e.keyCode == KeyCode.Z && (e.control || e.command))
+//            {
+//                Debug.Log("Undo Keydown");
+//                Undo.PerformUndo(); // EditメニューのUndoを強制的に実行
+//                e.Use();
+//            }
             else
             {
                 //            Debug.Log("other event:" + e.type);
