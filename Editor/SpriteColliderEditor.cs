@@ -106,7 +106,13 @@ public class SpriteColliderEditor : DGridBaseWindow
         }
         else if (e.type == EventType.MouseDrag)
         {
-            if (e.button == 0)
+            if (e.alt)
+            {
+                ViewMove(e);
+                e.Use();
+                return true;
+            }
+            else if (e.button == 0)
             {
                 switch (_dragType)
                 {
@@ -134,7 +140,8 @@ public class SpriteColliderEditor : DGridBaseWindow
         }
         else if (e.type == EventType.MouseDown)
         {
-            if (e.button == 0)
+            if (e.alt) { }
+            else if (e.button == 0)
             {
                 //
                 //                    modifySelection();
@@ -154,16 +161,6 @@ public class SpriteColliderEditor : DGridBaseWindow
         {
             if (e.button == 0)
             {
-                /*                    switch (_dragType)
-                                    {
-                                        case DragType.Item:
-                                            if (_dragFile != null)
-                                            {
-                                                _dragEndIndex = getIndex(_dragFile, e.mousePosition);
-                                                modifySelection();
-                                            }
-                                            break;
-                                    }*/
                 _dragType = DragType.None;
                 e.Use();
                 return true;

@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEditor;
 using DEditor;
 using DTileMap;
+using Unity.VisualScripting;
 
 /// <summary>
 /// タイルマップエディターウィンドウ
@@ -57,7 +58,13 @@ public class DTilemapEditorWindow : DGridBaseWindow
         }
         else if (e.type == EventType.MouseDrag)
         {
-            if (e.button == 0)
+            if (e.alt)
+            {
+                ViewMove(e);
+                e.Use();
+                return true;
+            }
+            else if (e.button == 0)
             {
                 switch (_dragType)
                 {
@@ -81,7 +88,8 @@ public class DTilemapEditorWindow : DGridBaseWindow
         }
         else if (e.type == EventType.MouseDown)
         {
-            if (e.button == 0)
+            if (e.alt) { } 
+            else if (e.button == 0)
             {
                 _regionFrom = Vector2Int.FloorToInt(GetLocalPosition(e.mousePosition));
                 _regionTo = Vector2Int.FloorToInt(GetLocalPosition(e.mousePosition));
