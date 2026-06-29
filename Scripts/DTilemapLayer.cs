@@ -138,7 +138,7 @@ namespace DTileMap
             List<Vector2> uvs = new List<Vector2>();
             List<int> triangles = new List<int>();
 
-            float margin = (0.1f/ _spriteCollider.TilemapTexture.width);
+            float margin = (0.05f/ _spriteCollider.TilemapTexture.width);
             float margin2 = margin*2f;
             for (int y = 0; y < _height; y++)
             {
