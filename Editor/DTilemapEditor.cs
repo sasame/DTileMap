@@ -395,7 +395,9 @@ public class DTileMapEditor : Editor
             edge.SetPoints(scaledEdge);
         }
 
-        EditorUtility.SetDirty(collider);
+        if (collider!=null){
+            EditorUtility.SetDirty(collider);
+        }
     }
 
     public override void OnInspectorGUI()
