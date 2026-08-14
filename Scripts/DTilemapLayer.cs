@@ -151,13 +151,15 @@ namespace DTileMap
 
                     // Quad頂点
                     int vIndex = vertices.Count;
-                    float px = x * _tileSize;
-                    float py = y * _tileSize;
+                    float px0 = x * _tileSize;
+                    float py0 = y * _tileSize;
+                    float px1 = (x+1) * _tileSize;
+                    float py1 = (y+1) * _tileSize;
 
-                    vertices.Add(new Vector3(px, py, 0));
-                    vertices.Add(new Vector3(px + _tileSize, py, 0));
-                    vertices.Add(new Vector3(px + _tileSize, py + _tileSize, 0));
-                    vertices.Add(new Vector3(px, py + _tileSize, 0));
+                    vertices.Add(new Vector3(px0, py0, 0));
+                    vertices.Add(new Vector3(px1, py0, 0));
+                    vertices.Add(new Vector3(px1, py1, 0));
+                    vertices.Add(new Vector3(px0, py1, 0));
 
                     // UV計算
                     int tx = tileId % tilesX;
