@@ -324,12 +324,6 @@ public class DTileMapEditor : Editor
     {
         DTilemapLayer tilemap = (DTilemapLayer)target;
 
-        var collider = tilemap.GetComponent<PolygonCollider2D>();
-        if (!collider)
-        {
-            collider = Undo.AddComponent<PolygonCollider2D>(tilemap.gameObject);
-        }
-
         var tiles = tilemap.Tiles;
         var spCollider = tilemap.SpriteCollider;
         if (spCollider == null) return;
@@ -365,13 +359,25 @@ public class DTileMapEditor : Editor
         }
         maker.RemoveOverlapEdge();
         maker.MergeLines();
+        
 
-        collider.pathCount = maker.PolygonList.Count;
-        for (int idEdge = 0; idEdge < maker.PolygonList.Count; ++idEdge)
-        {
-            var poly = maker.PolygonList[idEdge];
-            var scaledPoly = poly.ConvertAll<Vector2>(v => v * tilemap.TileSize);
-            collider.SetPath(idEdge, scaledPoly);
+        var collider = tilemap.GetComponent<PolygonCollider2D>();
+        if (maker.PolygonList.Count>0){
+            if (!collider)
+            {
+                collider = Undo.AddComponent<PolygonCollider2D>(tilemap.gameObject);
+            }
+            collider.pathCount = maker.PolygonList.Count;
+            for (int idEdge = 0; idEdge < maker.PolygonList.Count; ++idEdge)
+            {
+                var poly = maker.PolygonList[idEdge];
+                var scaledPoly = poly.ConvertAll<Vector2>(v => v * tilemap.TileSize);
+                collider.SetPath(idEdge, scaledPoly);
+            }
+        }else{
+            if (collider!=null){
+                Undo.DestroyObjectImmediate(collider);
+            }
         }
 
         // エッジコライダーをいったん消す
