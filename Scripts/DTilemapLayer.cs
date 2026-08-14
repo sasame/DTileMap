@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 using DCode;
 
 namespace DTileMap
@@ -186,6 +187,7 @@ namespace DTileMap
 
             initMesh();
             _mesh.Clear();
+            _mesh.indexFormat = (vertices.Count > ushort.MaxValue) ? IndexFormat.UInt32 : IndexFormat.UInt16;
             _mesh.SetVertices(vertices);
             _mesh.SetUVs(0, uvs);
             _mesh.SetTriangles(triangles, 0);
